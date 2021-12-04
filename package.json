@@ -1,0 +1,21 @@
+{
+  "name": "queues",
+  "version": "1.0.0",
+  "description": "Javascript queues implementation",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run lint && npm run testjs",
+    "testjs": "jest",
+    "lint": "eslint --ext .ts ."
+  },
+  "author": "Tomer Groisman",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint": "^8.4.0",
+    "eslint-config-google": "^0.14.0",
+    "ts-jest": "^27.0.7"
+  }
+}

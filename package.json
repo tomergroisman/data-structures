@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm run lint && npm run testjs",
     "testjs": "jest",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "prepare": "husky install"
   },
   "author": "Tomer Groisman",
   "license": "ISC",
@@ -18,10 +19,5 @@
     "eslint-config-google": "^0.14.0",
     "husky": "^7.0.4",
     "ts-jest": "^27.0.7"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run lint"
-    }
   }
 }

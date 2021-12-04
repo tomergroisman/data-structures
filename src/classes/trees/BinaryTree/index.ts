@@ -23,6 +23,17 @@ export class BinaryTree<T> {
   }
 
   /**
+   * Get a node of the tree
+   * @param {number} nodeNum A node index number
+   * @return {T | null} The value of the node
+   * @throws {RangeError} NodeNum is not a valid node
+   */
+  node(nodeNum: number): T| null {
+    const nodeIndex = this._nodeNumToIndex(nodeNum);
+    return this._tree[nodeIndex];
+  }
+
+  /**
    * Returns the parent of a node or null if the node is the root
    * @param {number} nodeNum A node index number
    * @return {T | null} The value of the parent node
@@ -59,6 +70,35 @@ export class BinaryTree<T> {
   }
 
   /**
+   * Add a new node to the end of the tree
+   * @param {T} node The node to add
+   */
+  addNode(node: T | null): void {
+    const nIndexes = this._tree.push(node);
+    if (node !== null) {
+      this._nodes.push(nIndexes - 1);
+    };
+  }
+
+  /**
+   * Swap between two nodes
+   * @param {number} nodeNum1 First node to swap
+   * @param {number} nodeNum2 Second node to swap
+   */
+  swap(nodeNum1: number, nodeNum2: number): void {
+    if (this.isNode(nodeNum1) && this.isNode(nodeNum2)) {
+      const index1 = this._nodeNumToIndex(nodeNum1);
+      const index2 = this._nodeNumToIndex(nodeNum2);
+
+      const key1 = this._tree[index1];
+      const key2 = this._tree[index2];
+
+      this._tree[index1] = key2;
+      this._tree[index2] = key1;
+    }
+  }
+
+  /**
    * Returns the depth of a node
    * @param {number} nodeNum A node index number
    * @return {number} The depth of the node
@@ -88,6 +128,22 @@ export class BinaryTree<T> {
     const hasNoLeftChild = !this.leftChild(nodeNum);
     const hasNoRightChild = !this.rightChild(nodeNum);
     return hasNoLeftChild && hasNoRightChild;
+  }
+
+  /**
+   * Returns a string representation of the tree
+   * @return {string} A string representation of the tree
+   */
+  toString(): string {
+    return this._tree.reduce((prev, current, i) => {
+      prev += current;
+      prev; // ?
+      this._isLastInDepthLevel(i);
+      if (this._isLastInDepthLevel(i)) {
+        return prev + '\n';
+      }
+      return prev + ' ';
+    }, '').slice(0, -1);
   }
 
   /**
@@ -146,21 +202,5 @@ export class BinaryTree<T> {
   _isLastInDepthLevel(index: number): boolean {
     const depth = this._depthOfIndex(index);
     return depth !== this._depthOfIndex(index + 1);
-  }
-
-  /**
-   * Returns a string representation of the tree
-   * @return {string} A string representation of the tree
-   */
-  toString(): string {
-    return this._tree.reduce((prev, current, i) => {
-      prev += current;
-      prev; // ?
-      this._isLastInDepthLevel(i);
-      if (this._isLastInDepthLevel(i)) {
-        return prev + '\n';
-      }
-      return prev + ' ';
-    }, '').slice(0, -1);
   }
 }

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run lint && npm run testjs",
     "testjs": "jest",
+    "testjs-watch": "jest --watchAll",
     "lint": "eslint --ext .ts .",
     "prepare": "husky install"
   },

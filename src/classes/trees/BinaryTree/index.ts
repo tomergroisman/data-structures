@@ -1,17 +1,19 @@
+import {BinaryTreeMaps, Element, Node} from './interfaces';
+
 /**
  * Class of a binary tree representation
  */
 export class BinaryTree<T> {
-  private _tree: (T | null)[];
-  private _nodes: number[];
+  private _tree: Node<T>[];
+  private _maps: BinaryTreeMaps;
 
   /**
    * A binary tree class constructor
-   * @param {(T | null)[]} tree An array representation of a binary tree (optional)
+   * @param {(Element<T>)[]} tree An array representation of a binary tree (optional)
    */
-  constructor(tree?: (T | null)[]) {
-    this._tree = tree ?? [];
-    this._nodes = this._getNodeNumToIndexMap();
+  constructor(tree?: (Element<T>)[]) {
+    this._tree = this._elementsArrayToTree(tree);
+    this._maps = this._generateBinaryTreeMaps();
   }
 
   /**
@@ -19,95 +21,116 @@ export class BinaryTree<T> {
    * @return {number} The size of the tree (number of nodes)
    */
   get size(): number {
-    return this._nodes.length;
-  }
-
-  /**
-   * Get a node of the tree
-   * @param {number} nodeNum A node index number
-   * @return {T | null} The value of the node
-   * @throws {RangeError} NodeNum is not a valid node
-   */
-  node(nodeNum: number): T| null {
-    const nodeIndex = this._nodeNumToIndex(nodeNum);
-    return this._tree[nodeIndex];
-  }
-
-  /**
-   * Returns the parent of a node or null if the node is the root
-   * @param {number} nodeNum A node index number
-   * @return {T | null} The value of the parent node
-   * @throws {RangeError} NodeNum is not a valid node
-   */
-  parent(nodeNum: number): T | null {
-    const nodeIndex = this._nodeNumToIndex(nodeNum);
-    const parentIndex = Math.floor((nodeIndex - 1) / 2);
-    return this._tree[parentIndex] ?? null;
-  }
-
-  /**
-   * Get the parent node tree index
-   * @param {number} nodeNum A node index number
-   * @return {number} The parent node tree index
-   */
-  parentNodeNum(nodeNum: number): number {
-    const nodeIndex = this._nodeNumToIndex(nodeNum);
-    const parentIndex = Math.floor((nodeIndex - 1) / 2);
-    return parentIndex;
-  }
-
-  /**
-   * Returns the left chide of a node or null if the left child is missing
-   * @param {number} nodeNum A node index number
-   * @return {T | null} The value of the left child node
-   * @throws {RangeError} NodeNum is not a valid node
-   */
-  leftChild(nodeNum: number): T | null {
-    const nodeIndex = this._nodeNumToIndex(nodeNum);
-    const leftChildIndex = ((nodeIndex + 1) * 2) - 1;
-    return this._tree[leftChildIndex] ?? null;
-  }
-
-  /**
-   * Returns the right chide of a node or null if the right child is missing
-   * @param {number} nodeNum A node index number
-   * @return {T | null} The value of the right child node
-   * @throws {RangeError} NodeNum is not a valid node
-   */
-  rightChild(nodeNum: number): T | null {
-    const nodeIndex = this._nodeNumToIndex(nodeNum);
-    const rightChildIndex = (nodeIndex + 1) * 2;
-    return this._tree[rightChildIndex] ?? null;
+    return this._maps.nodeToIndex.length;
   }
 
   /**
    * Get the root element of the tree
-   * @return {T | null} the root element
+   * @return {Element<T>} the root element
    */
-  get root(): T | null {
-    return this._tree[0] ?? null;
+  get root(): Element<T> {
+    return this._tree[0]?.element ?? null;
+  }
+
+  /**
+   * Get an element of the provided node index
+   * @param {number} nodeIndex A node index
+   * @return {Element<T>} The value of the node
+   * @throws {RangeError} node is not a valid node
+   */
+  element(nodeIndex: number): Element<T> {
+    const treeIndex = this._getTreeIndex(nodeIndex);
+    return this._tree[treeIndex].element;
+  }
+
+  /**
+   * Get the parent node index of the provided node index, or null if the parent is missing
+   * @param {number} nodeIndex A node index
+   * @return {number | null} The parent node index
+   * @throws {RangeError} node is not a valid node
+   */
+  parent(nodeIndex: number): number | null {
+    const treeIndex = this._getTreeIndex(nodeIndex);
+    const parentTreeIndex = Math.floor((treeIndex - 1) / 2);
+    try {
+      const parentNodeIndex = this._getNodeIndex(parentTreeIndex);
+      return parentNodeIndex;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Returns the left chide node index of the provided node index, or null if the left child is missing
+   * @param {number} nodeIndex A node index
+   * @return {number | null} The right child node index
+   * @throws {RangeError} node is not a valid node
+   */
+  leftChild(nodeIndex: number): number | null {
+    const treeIndex = this._getTreeIndex(nodeIndex);
+    const leftChildTreeIndex = ((treeIndex + 1) * 2) - 1;
+    try {
+      const leftChildNodeIndex = this._getNodeIndex(leftChildTreeIndex);
+      return leftChildNodeIndex;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Returns the right chide node index of the provided node index, or null if the right child is missing
+   * @param {number} nodeIndex A node index
+   * @return {number | null} The right child node index
+   * @throws {RangeError} node is not a valid node
+   */
+  rightChild(nodeIndex: number): number | null {
+    const treeIndex = this._getTreeIndex(nodeIndex);
+    const rightChildTreeIndex = (treeIndex + 1) * 2;
+    try {
+      const rightChildNodeIndex = this._getNodeIndex(rightChildTreeIndex);
+      return rightChildNodeIndex;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Returns the depth of the node index provided
+   * @param {number} nodeIndex A node index
+   * @return {number} The depth of the node
+   * @throws {RangeError} node is not a valid node
+   */
+  depthOf(nodeIndex: number): number {
+    const treeIndex = this._getTreeIndex(nodeIndex);
+    return this._depthOfIndex(treeIndex);
   }
 
   /**
    * Add a new node to the end of the tree
-   * @param {T} node The node to add
+   * @param {Element<T>} element The node to add
    */
-  addNode(node: T | null): void {
-    const nIndexes = this._tree.push(node);
-    if (node !== null) {
-      this._nodes.push(nIndexes - 1);
+  add(element: Element<T>): void {
+    const index = this._tree.length;
+    const node: Node<T> = {
+      element,
+      index,
+    };
+    this._tree.push(node);
+    if (element !== null) {
+      this._maps.nodeToIndex.push(index);
+      this._maps.indexToNode.push(this.size);
     };
   }
 
   /**
    * Swap between two nodes
-   * @param {number} nodeNum1 First node to swap
-   * @param {number} nodeNum2 Second node to swap
+   * @param {number} nodeIndex1 First node to swap
+   * @param {number} nodeIndex2 Second node to swap
    */
-  swap(nodeNum1: number, nodeNum2: number): void {
-    if (this.isNode(nodeNum1) && this.isNode(nodeNum2)) {
-      const index1 = this._nodeNumToIndex(nodeNum1);
-      const index2 = this._nodeNumToIndex(nodeNum2);
+  swap(nodeIndex1: number, nodeIndex2: number): void {
+    if (this.isNode(nodeIndex1) && this.isNode(nodeIndex2)) {
+      const index1 = this._getTreeIndex(nodeIndex1);
+      const index2 = this._getTreeIndex(nodeIndex2);
 
       const key1 = this._tree[index1];
       const key2 = this._tree[index2];
@@ -118,43 +141,23 @@ export class BinaryTree<T> {
   }
 
   /**
-   * Returns the depth of a node
-   * @param {number} nodeNum A node index number
-   * @return {number} The depth of the node
-   * @throws {RangeError} NodeNum is not a valid node
-   */
-  depth(nodeNum: number): number {
-    const nodeIndex = this._nodeNumToIndex(nodeNum);
-    return this._depthOfIndex(nodeIndex);
-  }
-
-  /**
-   * Returns the most right leaf index
-   * @return {number} The most right leaf index
-   */
-  get mostRightLeaf(): number {
-    const lastNodeNumber = this.size - 1;
-    return this._nodeNumToIndex(lastNodeNumber);
-  }
-
-  /**
-   * Returns true if the node is a valid node, false otherwise
-   * @param {number} nodeNum A node index number
+   * Returns true if the node of the provided node index is a valid node, false otherwise
+   * @param {number} nodeIndex A node index
    * @return {boolean} True of the node is a valid node, false otherwise
    */
-  isNode(nodeNum: number): boolean {
-    return this._nodes[nodeNum] !== undefined;
+  isNode(nodeIndex: number): boolean {
+    return this._maps.nodeToIndex[nodeIndex] !== undefined;
   }
 
   /**
    * Returns true if the node is a leaf, false otherwise
-   * @param {number} nodeNum A node index number
+   * @param {number} nodeIndex A node index number
    * @return {boolean} True if the node is a leaf, false otherwise
-   * @throws {RangeError} NodeNum is not a valid node
+   * @throws {RangeError} node is not a valid node
    */
-  isLeaf(nodeNum: number): boolean {
-    const hasNoLeftChild = !this.leftChild(nodeNum);
-    const hasNoRightChild = !this.rightChild(nodeNum);
+  isLeaf(nodeIndex: number): boolean {
+    const hasNoLeftChild = !this.leftChild(nodeIndex);
+    const hasNoRightChild = !this.rightChild(nodeIndex);
     return hasNoLeftChild && hasNoRightChild;
   }
 
@@ -164,7 +167,7 @@ export class BinaryTree<T> {
    */
   toString(): string {
     return this._tree.reduce((prev, current, i) => {
-      prev += current;
+      prev += current.element;
       this._isLastInDepthLevel(i);
       if (this._isLastInDepthLevel(i)) {
         return prev + '\n';
@@ -173,70 +176,98 @@ export class BinaryTree<T> {
     }, '').slice(0, -1);
   }
 
-  // /**
-  //  * Returns the most right leaf index
-  //  * @return {T | null} The most right leaf
-  //  */
-  // _getMostRightLeaf(): T | null {
-  //   return this._tree[this._getMostRightLeafIndex()];
-  // }
-
-
   /**
    * Returns true if the tree index is a valid tree index, false otherwise
-   * @param {number} index The tree index
+   * @param {(Element<T>)[]} elements The elements array (optional)
    * @return {boolean} True if the tree index is a valid tree index, false otherwise
    */
-  _isIndexValid(index: number): boolean {
-    return 0 <= index && index > this._tree.length;
+  _elementsArrayToTree(elements: (Element<T>)[] = []): Node<T>[] {
+    return elements.map((element, i) => ({
+      element: element,
+      index: i,
+    }));
   }
 
   /**
-   * Returns a tree index number of this node index number
-   * @param {number} nodeNum A node index number
-   * @return {number} The tree index of this node index number
-   * @throws {RangeError} NodeNum is not a valid node
+   * Returns true if the tree index is a valid tree index, false otherwise
+   * @param {number} treeIndex The tree index
+   * @return {boolean} True if the tree index is a valid tree index, false otherwise
    */
-  _nodeNumToIndex(nodeNum: number): number {
-    if (this.isNode(nodeNum)) {
-      return this._nodes[nodeNum];
+  _isTreeIndexValid(treeIndex: number): boolean {
+    return 0 <= treeIndex && treeIndex < this._maps.indexToNode.length;
+  }
+
+  /**
+   * Returns a tree index of this node index
+   * @param {number} nodeIndex A node index
+   * @return {number} The tree index of this node index
+   * @throws {RangeError} node index is not a valid node
+   */
+  _getTreeIndex(nodeIndex: number): number {
+    if (this.isNode(nodeIndex)) {
+      return this._maps.nodeToIndex[nodeIndex];
     }
     throw new RangeError('Node number is out of range');
   }
 
   /**
-   * Generate a map from node index to tree index (ignoring null nodes)
+   * Returns a node index of this tree index
+   * @param {number} treeIndex A tree index
+   * @return {number | null} The node index of this tree index
+   * @throws {RangeError} tree index is not a valid index
+   */
+  _getNodeIndex(treeIndex: number): number | null {
+    if (this._isTreeIndexValid(treeIndex)) {
+      return this._maps.indexToNode[treeIndex];
+    }
+    throw new RangeError('Index is out of range');
+  }
+
+  /**
+   * Generate a map from node index to tree index (ignoring null elements)
    * @return {number[]} An array map from node index to tree index
    */
-  _getNodeNumToIndexMap(): number[] {
-    return this._tree.reduce<number[]>((prev, current, i) => {
-      if (current !== null) {
-        prev.push(i);
+  _generateBinaryTreeMaps(): BinaryTreeMaps {
+    return this._tree.reduce<BinaryTreeMaps>((prev, current, treeIndex) => {
+      if (current.element !== null) {
+        const nodeIndex = prev.nodeToIndex.length;
+        prev.nodeToIndex.push(treeIndex);
+        prev.indexToNode.push(nodeIndex);
+      } else {
+        prev.indexToNode.push(null);
       }
       return prev;
-    }, []);
+    }, {
+      nodeToIndex: [],
+      indexToNode: [],
+    });
   }
 
   /**
    * Returns the depth of an index
-   * @param {number} index A tree index
+   * @param {number} treeIndex A tree index
    * @return {number} The depth of the tree index
-   * @throws {RangeError} NodeNum is not a valid node
+   * @throws {RangeError} node is not a valid node
    */
-  _depthOfIndex(index: number): number {
-    if (this._isIndexValid(index)) {
-      throw new RangeError('Index number is out of range');
+  _depthOfIndex(treeIndex: number): number {
+    if (this._isTreeIndexValid(treeIndex)) {
+      return Math.floor(Math.log2(treeIndex + 1));
     }
-    return Math.floor(Math.log2(index + 1));
+    throw new RangeError('Index number is out of range');
   }
 
   /**
    * Returns rue if the node is tree index is last in the depth level
-   * @param {number} index The index of the tree index
-   * @return {boolean} True if the node is tree index is last in the depth level
+   * @param {number} treeIndex the tree index
+   * @return {boolean} True if the node in the provided tree index is the last in the depth level
    */
-  _isLastInDepthLevel(index: number): boolean {
-    const depth = this._depthOfIndex(index);
-    return depth !== this._depthOfIndex(index + 1);
+  _isLastInDepthLevel(treeIndex: number): boolean {
+    const depthOfCurrent = this._depthOfIndex(treeIndex);
+    const nextTreeIndex = treeIndex + 1;
+    if (this._isTreeIndexValid(nextTreeIndex)) {
+      const depthOfNext = this._depthOfIndex(nextTreeIndex);
+      return depthOfCurrent < depthOfNext;
+    }
+    return true;
   }
 }

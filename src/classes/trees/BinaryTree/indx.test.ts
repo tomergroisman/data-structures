@@ -33,7 +33,7 @@ describe('Binary Tree Tests', () => {
     expect(tree.size).toBe(0);
     expect(() => tree.isLeaf(0)).toThrow(RangeError);
 
-    tree.addNode(1);
+    tree.add(1);
 
     expect(tree.size).toBe(1);
     expect(tree.isLeaf(0)).toBeTruthy();
@@ -42,16 +42,16 @@ describe('Binary Tree Tests', () => {
   it('should swap two nodes', () => {
     const tree = new BinaryTree();
 
-    tree.addNode(1);
-    tree.addNode(2);
+    tree.add(1);
+    tree.add(2);
 
-    expect(tree.node(0)).toBe(1);
-    expect(tree.node(1)).toBe(2);
+    expect(tree.element(0)).toBe(1);
+    expect(tree.element(1)).toBe(2);
 
     tree.swap(0, 1);
 
-    expect(tree.node(0)).toBe(2);
-    expect(tree.node(1)).toBe(1);
+    expect(tree.element(0)).toBe(2);
+    expect(tree.element(1)).toBe(1);
   });
 
   describe('Tree Node Tests', () => {
@@ -81,6 +81,8 @@ describe('Binary Tree Tests', () => {
     });
 
     it('should return node children', () => {
+      expect(tree.size).toBe(9);
+
       expect(tree.leftChild(0)).toBe(1);
       expect(tree.rightChild(0)).toBe(2);
 
@@ -143,16 +145,16 @@ describe('Binary Tree Tests', () => {
       expect(() => tree.isLeaf(9)).toThrow(RangeError);
     });
 
-    it('should return the depth of the nodes', () => {
-      expect(tree.depth(0)).toBe(0);
-      expect(tree.depth(1)).toBe(1);
-      expect(tree.depth(2)).toBe(1);
-      expect(tree.depth(3)).toBe(2);
-      expect(tree.depth(4)).toBe(2);
-      expect(tree.depth(5)).toBe(2);
-      expect(tree.depth(6)).toBe(3);
-      expect(tree.depth(7)).toBe(3);
-      expect(tree.depth(8)).toBe(4);
+    it('should return the depthOf of the nodes', () => {
+      expect(tree.depthOf(0)).toBe(0);
+      expect(tree.depthOf(1)).toBe(1);
+      expect(tree.depthOf(2)).toBe(1);
+      expect(tree.depthOf(3)).toBe(2);
+      expect(tree.depthOf(4)).toBe(2);
+      expect(tree.depthOf(5)).toBe(2);
+      expect(tree.depthOf(6)).toBe(3);
+      expect(tree.depthOf(7)).toBe(3);
+      expect(tree.depthOf(8)).toBe(4);
       expect(() => tree.isLeaf(9)).toThrow(RangeError);
     });
   });

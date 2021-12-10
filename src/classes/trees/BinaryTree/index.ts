@@ -46,6 +46,17 @@ export class BinaryTree<T> {
   }
 
   /**
+   * Get the parent node tree index
+   * @param {number} nodeNum A node index number
+   * @return {number} The parent node tree index
+   */
+  parentNodeNum(nodeNum: number): number {
+    const nodeIndex = this._nodeNumToIndex(nodeNum);
+    const parentIndex = Math.floor((nodeIndex - 1) / 2);
+    return parentIndex;
+  }
+
+  /**
    * Returns the left chide of a node or null if the left child is missing
    * @param {number} nodeNum A node index number
    * @return {T | null} The value of the left child node
@@ -67,6 +78,14 @@ export class BinaryTree<T> {
     const nodeIndex = this._nodeNumToIndex(nodeNum);
     const rightChildIndex = (nodeIndex + 1) * 2;
     return this._tree[rightChildIndex] ?? null;
+  }
+
+  /**
+   * Get the root element of the tree
+   * @return {T | null} the root element
+   */
+  get root(): T | null {
+    return this._tree[0] ?? null;
   }
 
   /**
@@ -110,6 +129,15 @@ export class BinaryTree<T> {
   }
 
   /**
+   * Returns the most right leaf index
+   * @return {number} The most right leaf index
+   */
+  get mostRightLeaf(): number {
+    const lastNodeNumber = this.size - 1;
+    return this._nodeNumToIndex(lastNodeNumber);
+  }
+
+  /**
    * Returns true if the node is a valid node, false otherwise
    * @param {number} nodeNum A node index number
    * @return {boolean} True of the node is a valid node, false otherwise
@@ -137,7 +165,6 @@ export class BinaryTree<T> {
   toString(): string {
     return this._tree.reduce((prev, current, i) => {
       prev += current;
-      prev; // ?
       this._isLastInDepthLevel(i);
       if (this._isLastInDepthLevel(i)) {
         return prev + '\n';
@@ -145,6 +172,15 @@ export class BinaryTree<T> {
       return prev + ' ';
     }, '').slice(0, -1);
   }
+
+  // /**
+  //  * Returns the most right leaf index
+  //  * @return {T | null} The most right leaf
+  //  */
+  // _getMostRightLeaf(): T | null {
+  //   return this._tree[this._getMostRightLeafIndex()];
+  // }
+
 
   /**
    * Returns true if the tree index is a valid tree index, false otherwise

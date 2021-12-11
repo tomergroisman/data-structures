@@ -5,6 +5,10 @@ export interface Node<T> {
   index: number
 }
 
+export interface BinaryTreeConstructor<T> {
+  tree?: (Element<T>)[]
+}
+
 export interface BinaryTreeMaps {
   nodeToIndex: number[],
   indexToNode: (number | null)[],

@@ -8,19 +8,19 @@ describe('Binary Tree Tests', () => {
   });
 
   it('should initialize a new binary tree from a pre defined tree', () => {
-    const tree = new BinaryTree([1, 2, null, 3]);
+    const tree = new BinaryTree({tree: [1, 2, null, 3]});
     expect(tree).toBeDefined();
     expect(tree.size).toBe(3);
   });
 
   it('should print the tree', () => {
-    const tree = new BinaryTree([
+    const tree = new BinaryTree({tree: [
       0,
       1, 2,
       3, 4, null, 5,
       null, null, 6, 7, null, null, null, null,
       null, null, null, null, 8,
-    ]);
+    ]});
     const expectation = (
       '0\n1 2\n3 4 null 5\nnull null 6 7 null null null null\nnull null null null 8'
     );
@@ -82,7 +82,7 @@ describe('Binary Tree Tests', () => {
        *   /
        *  8
        */
-      tree = new BinaryTree(
+      tree = new BinaryTree({tree:
           [
             0,
             1, 2,
@@ -90,7 +90,7 @@ describe('Binary Tree Tests', () => {
             null, null, 6, 7, null, null, null,
             null, null, null, null, null, 8,
           ],
-      );
+      });
     });
 
     it('should return node children', () => {

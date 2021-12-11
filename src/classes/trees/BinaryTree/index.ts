@@ -1,4 +1,4 @@
-import {BinaryTreeMaps, Element, Node} from './interfaces';
+import {BinaryTreeConstructor, BinaryTreeMaps, Element, Node} from './interfaces';
 
 /**
  * Class of a binary tree representation
@@ -11,7 +11,7 @@ export class BinaryTree<T> {
    * A binary tree class constructor
    * @param {(Element<T>)[]} tree an array representation of a binary tree (optional)
    */
-  constructor(tree?: (Element<T>)[]) {
+  constructor({tree}: BinaryTreeConstructor<T> = {}) {
     this._tree = this.elementsArrayToTree(tree);
     this._maps = this.generateBinaryTreeMaps();
   }

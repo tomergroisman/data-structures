@@ -95,6 +95,14 @@ export class BinaryTree<T> {
   }
 
   /**
+   * Returns the depth of the tree
+   * @return {number} the tree depth
+   */
+  get depth(): number {
+    return Math.floor(Math.log2(this.size));
+  }
+
+  /**
    * Returns the depth of the node index provided
    * @param {number} nodeIndex a node index
    * @return {number} the depth of the node
@@ -145,6 +153,9 @@ export class BinaryTree<T> {
 
       const value1 = this._tree[index1];
       const value2 = this._tree[index2];
+
+      value1.index = index2;
+      value2.index = index1;
 
       this._tree[index1] = value2;
       this._tree[index2] = value1;

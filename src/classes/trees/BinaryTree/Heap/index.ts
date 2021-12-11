@@ -18,6 +18,7 @@ export class Heap extends BinaryTree<number> {
     super(tree);
 
     this._type = type;
+    this.heapify();
   }
 
   /**
@@ -37,7 +38,7 @@ export class Heap extends BinaryTree<number> {
     const root = this.root;
 
     if (root !== null) {
-      const mostRightLeafNodeIndex = this.mostRightLeafNodeIndex;
+      const mostRightLeafNodeIndex = this.rightMostLeafNodeIndex;
       this.swap(0, mostRightLeafNodeIndex);
       this.remove(mostRightLeafNodeIndex);
       this.percolateDown();
@@ -58,7 +59,7 @@ export class Heap extends BinaryTree<number> {
    * Percolate a node up the tree (default most right leaf)
    * @param {number} nodeIndex a node index
    */
-  private percolateUp(nodeIndex = this.mostRightLeafNodeIndex): void {
+  private percolateUp(nodeIndex = this.rightMostLeafNodeIndex): void {
     const isEmpty = this.isEmpty();
     if (isEmpty) return;
 
@@ -97,7 +98,7 @@ export class Heap extends BinaryTree<number> {
     const leftChild = this.element(leftChildNodeIndex) as number;
     const rightChild = hasRightChild ? this.element(rightChildNodeIndex) as number : null;
 
-    if (rightChild) {
+    if (rightChild !== null) {
       switch (this._type) {
         case HeapType.MAX: {
           const candidateIndex = leftChild > rightChild ? leftChildNodeIndex! : rightChildNodeIndex!;
@@ -177,10 +178,26 @@ export class Heap extends BinaryTree<number> {
   }
 
   /**
+   * Build a heap out of the tree
+   * @param {number} nodeIndex a node index (optional)
+   */
+  private heapify(nodeIndex: number = this.rightMostLeafNodeIndex): void {
+    const isTreeEmpty = this.isEmpty();
+    if (isTreeEmpty) return;
+
+    this.percolateDown(nodeIndex);
+
+    const isRoot = this.isRoot(nodeIndex);
+    if (isRoot) return;
+
+    this.heapify(nodeIndex - 1);
+  }
+
+  /**
    * Returns the most right leaf index
    * @return {number} the most right leaf index
    */
-  private get mostRightLeafNodeIndex(): number {
+  private get rightMostLeafNodeIndex(): number {
     const lastNodeIndex = this.size - 1;
     return lastNodeIndex;
   }

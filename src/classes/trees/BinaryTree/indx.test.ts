@@ -27,16 +27,29 @@ describe('Binary Tree Tests', () => {
     expect(tree.toString()).toBe(expectation);
   });
 
-  it('should add a new node', () => {
+  it('should insert a new node to the tree', () => {
     const tree = new BinaryTree<number>();
 
     expect(tree.size).toBe(0);
     expect(() => tree.isLeaf(0)).toThrow(RangeError);
 
-    tree.insert(1);
+    tree.insert(0);
 
     expect(tree.size).toBe(1);
     expect(tree.isLeaf(0)).toBeTruthy();
+  });
+
+  it('should remove a node from the tree', () => {
+    const tree = new BinaryTree<number>();
+
+    tree.insert(0);
+    tree.insert(1);
+    tree.insert(2);
+
+    expect(tree.size).toBe(3);
+    tree.remove(1);
+    expect(tree.size).toBe(2);
+    expect(tree.toString()).toBe('0\n2');
   });
 
   it('should swap two nodes', () => {

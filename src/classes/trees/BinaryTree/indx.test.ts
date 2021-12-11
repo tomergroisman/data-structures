@@ -33,7 +33,7 @@ describe('Binary Tree Tests', () => {
     expect(tree.size).toBe(0);
     expect(() => tree.isLeaf(0)).toThrow(RangeError);
 
-    tree.add(1);
+    tree.insert(1);
 
     expect(tree.size).toBe(1);
     expect(tree.isLeaf(0)).toBeTruthy();
@@ -42,8 +42,8 @@ describe('Binary Tree Tests', () => {
   it('should swap two nodes', () => {
     const tree = new BinaryTree();
 
-    tree.add(1);
-    tree.add(2);
+    tree.insert(1);
+    tree.insert(2);
 
     expect(tree.element(0)).toBe(1);
     expect(tree.element(1)).toBe(2);

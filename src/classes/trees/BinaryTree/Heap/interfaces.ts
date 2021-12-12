@@ -1,3 +1,5 @@
+import {ComparisonFunction} from '../interfaces';
+
 export interface HeapConstructor<T> {
   type: HeapType,
   tree?: T[],
@@ -13,5 +15,3 @@ export enum PercolationDirection {
   UP = 'up',
   DOWN = 'down',
 }
-
-export type ComparisonFunction<T> = (a: T, b: T) => number;

@@ -67,6 +67,62 @@ describe('Binary Tree Tests', () => {
     expect(tree.element(1)).toBe(1);
   });
 
+  it('should insert a new node as a left child of an existing node', () => {
+    const tree = new BinaryTree();
+
+    tree.insert(1);
+    expect(tree.size).toBe(1);
+
+    tree.insertLeftChild(10, 0);
+    expect(tree.size).toBe(2);
+    expect(tree.element(1)).toBe(10);
+    expect(tree.toString()).toBe('1\n10');
+
+    tree.insertLeftChild(20, 0);
+    expect(tree.size).toBe(2);
+    expect(tree.element(1)).toBe(20);
+    expect(() => tree.element(2)).toThrow(RangeError);
+    expect(tree.toString()).toBe('1\n20');
+
+    tree.insertLeftChild(30, 1);
+    expect(tree.size).toBe(3);
+    expect(tree.element(2)).toBe(30);
+    expect(tree.toString()).toBe('1\n20 null\n30');
+  });
+
+  it('should insert a new node as a right child of an existing node', () => {
+    const tree = new BinaryTree();
+
+    tree.insert(1);
+    expect(tree.size).toBe(1);
+
+    tree.insertRightChild(10, 0);
+    expect(tree.size).toBe(2);
+    expect(tree.element(1)).toBe(10);
+    expect(tree.toString()).toBe('1\nnull 10');
+
+    tree.insertRightChild(20, 0);
+    expect(tree.size).toBe(2);
+    expect(tree.element(1)).toBe(20);
+    expect(() => tree.element(2)).toThrow(RangeError);
+    expect(tree.toString()).toBe('1\nnull 20');
+
+    tree.insertRightChild(30, 1);
+    expect(tree.size).toBe(3);
+    expect(tree.element(2)).toBe(30);
+    expect(tree.toString()).toBe('1\nnull 20\nnull null null 30');
+  });
+
+  it('should replace an existing node', () => {
+    const tree = new BinaryTree();
+
+    tree.insert(1);
+    expect(tree.element(0)).toBe(1);
+
+    tree.replace(10, 0);
+    expect(tree.element(0)).toBe(10);
+  });
+
   describe('Tree Node Tests', () => {
     let tree: BinaryTree<number>;
 

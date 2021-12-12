@@ -1,4 +1,4 @@
-import {BinaryTreeConstructor, BinaryTreeMaps, Element, Node} from './interfaces';
+import {BinaryTreeConstructor, BinaryTreeMaps, Child, Element, Node} from './interfaces';
 
 /**
  * Class of a binary tree representation
@@ -114,20 +114,60 @@ export class BinaryTree<T> {
   }
 
   /**
-   * Add a new node to the end of the tree
-   * @param {Element<T>} element the node to add
+   * Insert a new node to the end of the tree
+   * @param {Element<T>} element the element to insert
    */
   insert(element: Element<T>): void {
-    const index = this._tree.length;
-    const node: Node<T> = {
-      element,
-      index,
-    };
-    this._tree.push(node);
-    if (element !== null) {
-      this._maps.indexToNode.push(this.size);
-      this._maps.nodeToIndex.push(index);
-    };
+    const newTreeIndex = this._tree.length;
+    const newNodeIndex = this.size;
+    const newNode = this.createNode(element, newTreeIndex);
+
+    this.insertToTree(newNode, newNodeIndex, newTreeIndex);
+  }
+
+  /**
+   * Insert a new node as a left child os a existing node
+   * @param {Element<T>} element the element to insert
+   * @param {number} nodeIndex the upcoming parent node index
+   * @throws {RangeError} node is not a valid node
+   */
+  insertLeftChild(element: Element<T>, nodeIndex: number): void {
+    const leftChildNodeIndex = this.leftChild(nodeIndex);
+    const hasLeftChild = leftChildNodeIndex !== null;
+    if (hasLeftChild) {
+      this.replace(element, leftChildNodeIndex);
+    } else {
+      this.insertChild(element, nodeIndex, Child.LEFT);
+    }
+  }
+
+  /**
+   * Insert a new node as a right child os a existing node
+   * @param {Element<T>} element the element to insert
+   * @param {number} nodeIndex the upcoming parent node index
+   * @throws {RangeError} node is not a valid node
+   */
+  insertRightChild(element: Element<T>, nodeIndex: number): void {
+    const rightChildNodeIndex = this.rightChild(nodeIndex);
+    const hasRightChild = rightChildNodeIndex !== null;
+    if (hasRightChild) {
+      this.replace(element, rightChildNodeIndex);
+    } else {
+      this.insertChild(element, nodeIndex, Child.RIGHT);
+    }
+  }
+
+  /**
+   * Replace an existing node with a new provided element
+   * @param {Element<T>} element the element to add
+   * @param {number} nodeIndex the node index to replace
+   * @throws {RangeError} node is not a valid node
+   */
+  replace(element: Element<T>, nodeIndex: number): void {
+    const treeIndex = this.getTreeIndex(nodeIndex);
+    const newNode = this.createNode(element, treeIndex);
+
+    this._tree[treeIndex] = newNode;
   }
 
   /**
@@ -208,7 +248,8 @@ export class BinaryTree<T> {
    */
   toString(): string {
     return this._tree.reduce((prev, current, i) => {
-      prev += current.element;
+      prev += current !== null ? current.element : null;
+      i; // ?
       this.isLastInDepthLevel(i);
       if (this.isLastInDepthLevel(i)) {
         return prev + '\n';
@@ -250,6 +291,57 @@ export class BinaryTree<T> {
       return this._maps.indexToNode[treeIndex];
     }
     throw new RangeError('Index is out of range');
+  }
+
+  /**
+   * Create a node from element and index
+   * @param {Element<T>} element the element of the node
+   * @param {number} index the index of the node
+   * @return {Node<T>} the node object
+   */
+  protected createNode(element: Element<T>, index: number): Node<T> {
+    const node: Node<T> = {
+      element: element,
+      index: index,
+    };
+
+    return node;
+  }
+
+  /**
+   * Insert a new node as a child of a existing node
+   * @param {Element<T>} element the element to insert
+   * @param {number} nodeIndex the upcoming parent node index
+   * @param {Child} child the child direction (left or right)
+   * @throws {RangeError} node is not a valid node
+   */
+  private insertChild(element: Element<T>, nodeIndex: number, child: Child): void {
+    const treeIndex = this.getTreeIndex(nodeIndex);
+    const newTreeIndex = child === Child.LEFT ?
+      ((treeIndex + 1) * 2) - 1 :
+      (treeIndex + 1) * 2;
+    const newNodeIndex = this.size;
+    const newNode = this.createNode(element, newTreeIndex);
+
+    this.insertToTree(newNode, newNodeIndex, newTreeIndex);
+  }
+
+  /**
+   * Update the tree maps after new node insertion
+   * @param {Node<T>} node the new node to insert
+   * @param {number} nodeIndex the added element node index
+   * @param {number} treeIndex the added element tree index
+   */
+  private insertToTree(node: Node<T>, nodeIndex: number, treeIndex: number): void {
+    const numberOfAddedNullNodes = treeIndex - this._tree.length;
+    const nullNodes = Array(numberOfAddedNullNodes).fill(null);
+    this._tree.push(...nullNodes, node);
+    if (node.element !== null) {
+      this._maps.indexToNode.push(...nullNodes, nodeIndex);
+      this._maps.nodeToIndex.push(treeIndex);
+    } else {
+      this._maps.indexToNode.push(...nullNodes, null);
+    };
   }
 
   /**

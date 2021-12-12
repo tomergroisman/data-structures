@@ -13,3 +13,10 @@ export interface BinaryTreeMaps {
   nodeToIndex: number[],
   indexToNode: (number | null)[],
 }
+
+export type ComparisonFunction<T> = (a: T, b: T) => number;
+
+export enum Child {
+  LEFT = 'left',
+  RIGHT = 'right',
+}

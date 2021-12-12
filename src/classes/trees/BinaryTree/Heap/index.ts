@@ -1,10 +1,9 @@
 import {BinaryTree} from '..';
-import {Element, Node} from '../interfaces';
+import {ComparisonFunction, Element, Node} from '../interfaces';
 
 import {
   HeapConstructor,
   HeapType,
-  ComparisonFunction,
   PercolationDirection,
 } from './interfaces';
 
@@ -16,9 +15,9 @@ export class Heap<T> extends BinaryTree<T> {
   private _comparisonFunction?: ComparisonFunction<T>;
 
   /**
-   * A queue priority class constructor
-   * @param {HeapType} type the type of the prioritized queue (min or max)
-   * @param {T[]} tree an array representation of a priority queue (optional)
+   * A heap class constructor
+   * @param {HeapType} type the type of the heap (min or max)
+   * @param {T[]} tree an array representation of a heap (optional)
    * @param {ComparisonFunction<T>} comparisonFunction a custom comparison function (optional)
    */
   constructor({type, tree, comparisonFunction}: HeapConstructor<T>) {
@@ -31,8 +30,8 @@ export class Heap<T> extends BinaryTree<T> {
   }
 
   /**
-   *
-   * @param {T} element an element to add to the queue
+   * Insert an element to the heap
+   * @param {T} element an element to insert the heap
    */
   insert(element: T): void {
     super.insert(element);
@@ -216,7 +215,7 @@ export class Heap<T> extends BinaryTree<T> {
   }
 
   /**
-   * Build a heap out of the tree
+   * Build a heap out of a tree representation
    * @param {number} nodeIndex a node index (optional)
    */
   private heapify(nodeIndex: number = this.rightMostLeafNodeIndex): void {

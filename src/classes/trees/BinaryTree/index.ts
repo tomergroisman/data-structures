@@ -249,7 +249,6 @@ export class BinaryTree<T> {
   toString(): string {
     return this._tree.reduce((prev, current, i) => {
       prev += current !== null ? current.element : null;
-      i; // ?
       this.isLastInDepthLevel(i);
       if (this.isLastInDepthLevel(i)) {
         return prev + '\n';
@@ -320,10 +319,57 @@ export class BinaryTree<T> {
     const newTreeIndex = child === Child.LEFT ?
       ((treeIndex + 1) * 2) - 1 :
       (treeIndex + 1) * 2;
-    const newNodeIndex = this.size;
     const newNode = this.createNode(element, newTreeIndex);
+    const isExistingInTree = newTreeIndex < this._tree.length;
+    if (isExistingInTree) {
+      this.nodeifyNullTreeIndex(newNode, newTreeIndex);
+    } else {
+      const newNodeIndex = this.size;
+      this.insertToTree(newNode, newNodeIndex, newTreeIndex);
+    }
+  }
 
-    this.insertToTree(newNode, newNodeIndex, newTreeIndex);
+  /**
+   * Replace a null tree index with a valid node
+   * @param {Node<T>} node the new node to insert
+   * @param {number} treeIndex the added element tree index
+   */
+  private nodeifyNullTreeIndex(node: Node<T>, treeIndex: number) {
+    if (node.element !== null) {
+      const nodeIndex = this.nextNodeIndex(treeIndex);
+      if (nodeIndex) {
+        this._tree.splice(treeIndex, 1, node);
+        this._maps.indexToNode.splice(treeIndex, 1, nodeIndex);
+        this._maps.nodeToIndex.splice(nodeIndex, 0, treeIndex);
+        this.updateIndexesInTreeIndexMap(nodeIndex);
+      }
+    };
+  }
+
+  /**
+   * Returns the nearest node index to the provided tree index
+   * @param {number} treeIndex the tree index
+   * @return {number} the nearest next node index
+   */
+  private nextNodeIndex(treeIndex: number): number | undefined {
+    for (let i = treeIndex; i < this._tree.length; i++) {
+      const nodeIndex = this._maps.indexToNode[i];
+      if (nodeIndex != null) {
+        return nodeIndex;
+      }
+    }
+  }
+
+  /**
+   * Update the index to node index map after nodeify
+   * @param {number} startFrom the map index to start from
+   */
+  private updateIndexesInTreeIndexMap(startFrom: number): void {
+    const map = this._maps.indexToNode;
+    const correctIndexes = map.slice(0, startFrom + 1);
+    const incorrectIndexes = map.slice(startFrom + 1);
+    const fixesIndexes = incorrectIndexes.map((index) => index !== null ? index + 1 : null);
+    this._maps.indexToNode = [...correctIndexes, ...fixesIndexes];
   }
 
   /**
